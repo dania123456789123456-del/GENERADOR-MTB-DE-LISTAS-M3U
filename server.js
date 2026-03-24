@@ -6,37 +6,67 @@ const PORT = process.env.PORT || 3000;
 const USER = "juan123";
 const PASS = "123456";
 
-const data = {
-  live: [
-    {
-      name: "Canal 1",
-      stream_id: 1,
-      url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-    }
-  ],
-  movies: [
-    {
-      name: "Película Demo",
-      stream_id: 100,
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    }
-  ],
-  series: [
-    {
-      series_id: 200,
-      name: "Serie Demo",
-      episodes: [
+// 📊 DATA
+const live_categories = [{ category_id: "1", category_name: "TV" }];
+const vod_categories = [{ category_id: "2", category_name: "Películas" }];
+const series_categories = [{ category_id: "3", category_name: "Series" }];
+
+const live_streams = [
+  {
+    name: "Canal 1",
+    stream_id: 1,
+    category_id: "1",
+    stream_type: "live",
+    stream_icon: "",
+    direct_source: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  }
+];
+
+const vod_streams = [
+  {
+    name: "Película Demo",
+    stream_id: 100,
+    category_id: "2",
+    stream_type: "movie",
+    stream_icon: "",
+    container_extension: "mp4",
+    direct_source: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  }
+];
+
+const series_list = [
+  {
+    series_id: 200,
+    name: "Serie Demo",
+    category_id: "3",
+    cover: "",
+    plot: "",
+    genre: "",
+    releaseDate: "",
+    rating: "5"
+  }
+];
+
+const series_info = {
+  200: {
+    info: {
+      name: "Serie Demo"
+    },
+    episodes: {
+      "1": [
         {
+          id: 1,
           episode_num: 1,
           title: "Capítulo 1",
-          url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+          container_extension: "mp4",
+          direct_source: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
         }
       ]
     }
-  ]
+  }
 };
 
-// 🔐 LOGIN + API XTREAM
+// 🔐 LOGIN
 app.get("/player_api.php", (req, res) => {
   const { username, password, action } = req.query;
 
@@ -44,7 +74,6 @@ app.get("/player_api.php", (req, res) => {
     return res.json({ user_info: { auth: 0 } });
   }
 
-  // LOGIN
   if (!action) {
     return res.json({
       user_info: {
@@ -52,54 +81,45 @@ app.get("/player_api.php", (req, res) => {
         password: PASS,
         auth: 1,
         status: "Active"
-      },
-      server_info: {
-        url: req.hostname,
-        port: PORT,
-        https_port: PORT,
-        server_protocol: "http"
       }
     });
   }
 
-  // TV
-  if (action === "get_live_streams") {
-    return res.json(data.live);
-  }
+  if (action === "get_live_categories") return res.json(live_categories);
+  if (action === "get_vod_categories") return res.json(vod_categories);
+  if (action === "get_series_categories") return res.json(series_categories);
 
-  // Películas
-  if (action === "get_vod_streams") {
-    return res.json(data.movies);
-  }
+  if (action === "get_live_streams") return res.json(live_streams);
+  if (action === "get_vod_streams") return res.json(vod_streams);
+  if (action === "get_series") return res.json(series_list);
 
-  // Series
-  if (action === "get_series") {
-    return res.json(data.series);
+  if (action === "get_series_info") {
+    const id = req.query.series_id;
+    return res.json(series_info[id]);
   }
 
   res.json({});
 });
 
-// 📡 STREAMS
+// ▶ STREAMS
 app.get("/live/:user/:pass/:id.m3u8", (req, res) => {
-  const stream = data.live.find(s => s.stream_id == req.params.id);
-  if (stream) res.redirect(stream.url);
+  const s = live_streams.find(x => x.stream_id == req.params.id);
+  if (s) res.redirect(s.direct_source);
   else res.sendStatus(404);
 });
 
 app.get("/movie/:user/:pass/:id.mp4", (req, res) => {
-  const movie = data.movies.find(m => m.stream_id == req.params.id);
-  if (movie) res.redirect(movie.url);
+  const m = vod_streams.find(x => x.stream_id == req.params.id);
+  if (m) res.redirect(m.direct_source);
   else res.sendStatus(404);
 });
 
 app.get("/series/:user/:pass/:id.mp4", (req, res) => {
-  const serie = data.series[0];
-  const ep = serie.episodes[0];
-  if (ep) res.redirect(ep.url);
+  const ep = series_info[200].episodes["1"][0];
+  if (ep) res.redirect(ep.direct_source);
   else res.sendStatus(404);
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor Xtream corriendo en puerto " + PORT);
+  console.log("Xtream FULL corriendo");
 });
