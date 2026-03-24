@@ -41,7 +41,47 @@ function auth(req) {
 }
 
 app.get("/player_api.php", (req, res) => {
-  if (!auth(req)) return res.json({ user_info: { auth: 0 } });
+  const { username, password, action } = req.query;
+
+  if (username !== USER || password !== PASS) {
+    return res.json({ user_info: { auth: 0 } });
+  }
+
+  // LOGIN
+  if (!action) {
+    return res.json({
+      user_info: {
+        username: USER,
+        password: PASS,
+        auth: 1,
+        status: "Active"
+      },
+      server_info: {
+        url: req.hostname,
+        port: PORT,
+        https_port: PORT,
+        server_protocol: "http"
+      }
+    });
+  }
+
+  // TV
+  if (action === "get_live_streams") {
+    return res.json(data.live);
+  }
+
+  // Películas
+  if (action === "get_vod_streams") {
+    return res.json(data.movies);
+  }
+
+  // Series
+  if (action === "get_series") {
+    return res.json(data.series);
+  }
+
+  res.json({});
+});
 
   res.json({
     user_info: {
