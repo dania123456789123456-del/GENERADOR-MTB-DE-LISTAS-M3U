@@ -66,8 +66,43 @@ const series_info = {
   }
 };
 
-// 🔐 LOGIN
+// 🔐 PLAYER API
 app.get("/player_api.php", (req, res) => {
+  const { username, password, action } = req.query;
+
+  if (username !== USER || password !== PASS) {
+    return res.json({ user_info: { auth: 0 } });
+  }
+
+  if (!action) {
+    return res.json({
+      user_info: {
+        username: USER,
+        password: PASS,
+        auth: 1,
+        status: "Active"
+      }
+    });
+  }
+
+  if (action === "get_live_categories") return res.json(live_categories);
+  if (action === "get_vod_categories") return res.json(vod_categories);
+  if (action === "get_series_categories") return res.json(series_categories);
+
+  if (action === "get_live_streams") return res.json(live_streams);
+  if (action === "get_vod_streams") return res.json(vod_streams);
+  if (action === "get_series") return res.json(series_list);
+
+  if (action === "get_series_info") {
+    const id = req.query.series_id;
+    return res.json(series_info[id]);
+  }
+
+  res.json({});
+});
+
+// 🔐 PANEL API (CLAVE 🔥)
+app.get("/panel_api.php", (req, res) => {
   const { username, password, action } = req.query;
 
   if (username !== USER || password !== PASS) {
