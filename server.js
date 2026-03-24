@@ -36,10 +36,7 @@ const data = {
   ]
 };
 
-function auth(req) {
-  return req.query.username === USER && req.query.password === PASS;
-}
-
+// 🔐 LOGIN + API XTREAM
 app.get("/player_api.php", (req, res) => {
   const { username, password, action } = req.query;
 
@@ -83,31 +80,7 @@ app.get("/player_api.php", (req, res) => {
   res.json({});
 });
 
-  res.json({
-    user_info: {
-      username: USER,
-      password: PASS,
-      auth: 1,
-      status: "Active"
-    }
-  });
-});
-
-app.get("/get_live_streams", (req, res) => {
-  if (!auth(req)) return res.send([]);
-  res.json(data.live);
-});
-
-app.get("/get_vod_streams", (req, res) => {
-  if (!auth(req)) return res.send([]);
-  res.json(data.movies);
-});
-
-app.get("/get_series", (req, res) => {
-  if (!auth(req)) return res.send([]);
-  res.json(data.series);
-});
-
+// 📡 STREAMS
 app.get("/live/:user/:pass/:id.m3u8", (req, res) => {
   const stream = data.live.find(s => s.stream_id == req.params.id);
   if (stream) res.redirect(stream.url);
@@ -121,11 +94,12 @@ app.get("/movie/:user/:pass/:id.mp4", (req, res) => {
 });
 
 app.get("/series/:user/:pass/:id.mp4", (req, res) => {
-  const ep = data.series[0].episodes[0];
+  const serie = data.series[0];
+  const ep = serie.episodes[0];
   if (ep) res.redirect(ep.url);
   else res.sendStatus(404);
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor corriendo");
+  console.log("Servidor Xtream corriendo en puerto " + PORT);
 });
