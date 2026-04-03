@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">    
+
+<meta charset="UTF-8">
+<title>Panel IPTV TMDB</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+body{
+font-family:Segoe UI, Arial;
+color:white;
+padding:30px;
+max-width:900px;
+margin:auto;
+
+background:
+radial-gradient(circle at 20% 20%,#350000,transparent 40%),
+radial-gradient(circle at 80% 10%,#240000,transparent 40%),
+radial-gradient(circle at 50% 90%,#200000,transparent 40%),
+#050505;
+
+background-size:200% 200%;
+animation:fondo 18s infinite alternate;
+}
+
+@keyframes fondo{
+0%{background-position:0% 0%;}
+100%{background-position:100% 100%;}
+}
+
+@keyframes brilloLogo{
+
+0%{
+filter:drop-shadow(0 0 5px #ff0000);
+}
+
+50%{
+filter:drop-shadow(0 0 20px #ff2a2a);
+}
+
+100%{
+filter:drop-shadow(0 0 10px #ff0000);
+}
+
+}
+
+.logo{
+display:block;
+margin:auto;
+width:200px; /* tamaño del logo */
+margin-bottom:30px;
+filter:drop-shadow(0 0 10px #ff0000);
+animation:brilloLogo 3s infinite alternate;
+}
+
+/* CAMBIAR LOGO AQUI */
+
+h1{
+text-align:center;
+font-family:'Creepster', cursive;
+font-size:70px;
+letter-spacing:5px;
+margin-bottom:40px;
+color:#ff1a1a;
+
+text-shadow:
+0 0 10px #ff0000,
+0 0 20px #ff0000,
+0 0 40px #ff0000,
+0 0 60px #ff0000;
+
+}
+
+#tmdb_id{
+width:100%;
+padding:18px;
+border-radius:14px;
+border:1px solid #333;
+background:#0a0a0a;
+color:white;
+font-size:16px;
+}
+
+button{
+padding:16px 40px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.buscar{
+background:linear-gradient(90deg,#ff0000,#ff4040);
+color:white;
+}
+
+.agregar{
+background:linear-gradient(90deg,#7b4dff,#5d3cff);
+color:white;
+margin-top:25px;
+}
+
+#info,#links,#lista,textarea{
+width:100%;
+margin-top:25px;
+background:rgba(20,20,20,0.85);
+border-radius:20px;
+padding:25px;
+}
+
+.poster{
+height:240px;
+margin-top:15px;
+margin-bottom:20px;
+border-radius:12px;
+}
+
+#info p{
+line-height:1.6;
+margin-top:5px;
+}
+
+.season{
+margin-top:35px;
+}
+
+.season-title{
+font-size:18px;
+font-weight:bold;
+color:#ff0000;
+cursor:pointer;
+margin-bottom:18px;
+}
+
+/* GRID EPISODIOS */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(60px,1fr));
+gap:14px;
+margin-bottom:20px;
+}
+
+.ep{
+background:#111;
+padding:10px;
+border-radius:8px;
+text-align:center;
+cursor:pointer;
+border:1px solid #333;
+}
+
+.ep.active{
+background:#37d06d;
+}
+
+/* EDITOR EPISODIO */
+
+.editor{
+display:none;
+margin-top:20px;
+background:#0b0b0b;
+padding:20px;
+border-radius:12px;
+border:1px solid #333;
+}
+
+.editor-flex{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+.editor-info{
+min-width:220px;
+}
+
+.editor textarea{
+flex:1;
+height:50px;
+background:#060606;
+border:1px solid #333;
+border-radius:6px;
+color:white;
+padding:10px;
+}
+
+/* LISTA */
+
+#contador{
+margin-top:30px;
+font-size:16px;
+color:#00ff9c;
+}
+
+h2{
+margin-top:25px;
+margin-bottom:10px;
+}
+
+#lista{
+max-height:300px;
+overflow-y:auto;
+}
+
+.lista-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px;
+margin-bottom:6px;
+background:#111;
+border-radius:8px;
+}
+
+/* GRID BUSQUEDA TIPO NETFLIX */
+#links{
+display:grid;
+grid-template-columns: repeat(5, 1fr);
+gap:15px;
+margin-top:20px;
+}
+
+/* TARJETAS */
+.card-busqueda{
+background:#111;
+border-radius:15px;
+overflow:hidden;
+cursor:pointer;
+transition:0.3s;
+}
+
+.card-busqueda:hover{
+transform:scale(1.05);
+box-shadow:0 0 15px #ff0000;
+}
+
+/* POSTER */
+.poster-busqueda{
+width:100%;
+height:230px;
+object-fit:cover;
+}
+
+/* TITULO */
+.titulo-busqueda{
+padding:8px;
+font-size:13px;
+text-align:center;
+color:white;
+font-weight:bold;
+}
+
+.btn-eliminar{
+background:#ff3b3b;
+border:none;
+color:white;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:12px;
+}
+
+/* CHECKBOX */
+
+label{
+display:flex;
+align-items:center;
+gap:12px;   /* ESPACIO ENTRE CHECKBOX Y TEXTO */
+margin-top:25px;
+margin-bottom:15px;
+}
+
+/* BOTONES M3U */
+
+.m3u-buttons{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+.m3u-buttons button:nth-child(1){
+background:linear-gradient(90deg,#ff0000,#ff4040);
+color:white;
+}
+
+.m3u-buttons button:nth-child(2){
+background:linear-gradient(90deg,#7b4dff,#5d3cff);
+color:white;
+}
+
+.m3u-buttons button:nth-child(3){
+background:linear-gradient(90deg,#37d06d,#2fb358);
+color:white;
+}
+
+textarea{
+height:260px;
+background:#020202;
+padding:20px;
+border:1px solid #222;
+color:#00ff9c;
+font-family:monospace;
+font-size:14px;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+margin-top:60px;
+color:#888;
+font-size:14px;
+cursor:pointer;
+}
+
+/* BUSCADOR */
+
+.buscador{
+display:flex;
+gap:10px;
+align-items:stretch;
+margin-bottom:15px;
+}
+
+.buscador input{
+flex:1;
+}
+
+.buscador button{
+white-space:nowrap;
+}
+
+.confirm-box{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:999;
+}
+
+.confirm-content{
+background:#0b0b0b;
+border:1px solid #ff0000;
+padding:30px;
+border-radius:14px;
+text-align:center;
+max-width:350px;
+}
+
+.confirm-content p{
+margin-bottom:20px;
+font-size:16px;
+}
+
+.confirm-buttons{
+display:flex;
+gap:10px;
+justify-content:center;
+}
+
+.confirm-buttons button:first-child{
+background:linear-gradient(90deg,#ff0000,#ff4040);
+color:white;
+}
+
+.confirm-buttons button:last-child{
+background:#222;
+color:white;
+}
+
+.ya-existe{
+margin-left:15px;
+color:#00ff9c;
+font-weight:bold;
+}
+
+.item-existe{
+color:#00ff9c;
+font-weight:bold;
+}
+
+#links{
+transition:opacity 0.2s ease;
+}
+
+#listaPastebin{
+margin-top:25px;
+}
+
+/* ESPACIO ENTRE BLOQUES PRINCIPALES */
+#listaPastebin > div{
+margin-top:20px;
+}
+
+/* ESPACIO ENTRE ITEMS (películas y episodios) */
+#listaPastebin div div{
+margin-top:6px;
+}
+
+/* ESPACIO ENTRE TEMPORADAS / SERIES */
+.season-title{
+margin-top:25px;
+display:block;
+}
+
+/* MÁS ESPACIO SOLO PARA SERIES Y PELICULAS PRINCIPALES */
+#listaPastebin > .season-title{
+margin-top:35px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- CAMBIAR LOGO -->
+<img class="logo" src="https://i.postimg.cc/ryG35JNN/Black-Red-and-White-Modern-Illustrative-Spooky-Movie-Halloween-Logo-20260315-184147-0000.png">
+
+<h1>Panel IPTV TMDB</h1>
+
+<div class="buscador">
+
+<input id="tmdb_id" placeholder="Buscar película, serie o pegar ID TMDB">
+
+<button class="buscar" onclick="buscar()">Buscar</button>
+
+</div>
+
+<div id="info"></div>
+
+<div id="links"></div>
+
+<div id="editor" class="editor">
+
+<div class="editor-flex">
+
+<div class="editor-info">
+<div id="editor-title"></div>
+<div id="editor-name"></div>
+</div>
+
+<textarea id="editor-link" placeholder="Pegar link del episodio"></textarea>
+
+</div>
+
+</div>
+
+<button class="agregar" onclick="agregar()">Agregar a lista</button>
+
+<div id="contador">Total agregado: 0</div>
+
+<h2>Contenido agregado</h2>
+
+<div id="lista"></div>
+
+<label>
+<input type="checkbox" id="m3ucheck" checked>
+Iniciar nueva lista (#EXTM3U)
+</label>
+
+<div class="m3u-buttons">
+
+<button onclick="generar()">Generar lista M3U</button>
+
+<button onclick="copiar()">Copiar M3U</button>
+
+<button onclick="limpiar()">Limpiar lista</button>
+
+</div>
+
+<textarea id="resultado"></textarea>
+
+<h2>Lista publicada (GitHub)</h2>
+
+<button onclick="verListaPastebin()">Cargar lista</button>
+
+<div id="listaPastebin"></div>
+
+<!-- CAMBIAR INSTAGRAM AQUI -->
+<div class="footer" onclick="window.open('https://www.instagram.com/juan_nsr21?igsh=OXIwZzB5cGNiMWY4')">
+Created by JUAN NSR
+</div>
+
+<script>
+
+const apiKey="3ba1079b7db0165cabfc8282f7e5d7ee"
+
+let contenidoExistente=[]
+
+let contenido={}
+let base=[]
+base=JSON.parse(localStorage.getItem("iptv_lista")) || []
+let currentEpisode=null
+
+let postersTemporadas = {}
+
+/* BUSCADOR PRINCIPAL */
+
+async function buscar(){
+
+let query=document.getElementById("tmdb_id").value.trim()
+
+document.getElementById("links").innerHTML=""
+document.getElementById("info").innerHTML=""
+document.getElementById("links").style.display="grid"
+document.getElementById("editor").style.display="none"
+currentEpisode=null
+
+/* SI ES NUMERO -> BUSCAR POR ID */
+
+if(!isNaN(query)){
+buscarPorID(query)
+return
+}
+
+/* SI ES TEXTO -> BUSCAR POR NOMBRE */
+
+buscarPorNombre(query)
+
+}
+
+
+/* BUSCAR POR NOMBRE */
+
+async function buscarPorNombre(query){
+
+let res=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&language=es&query=${query}`)
+let data=await res.json()
+
+let html=""
+
+data.results.forEach(item=>{
+
+let titulo=item.title || item.name
+let tipo=item.media_type
+let poster=item.poster_path
+
+if(!titulo || !poster) return
+
+html+=`
+<div class="card-busqueda" onclick="seleccionarResultado('${tipo}',${item.id})">
+
+<img src="https://image.tmdb.org/t/p/w500${poster}" class="poster-busqueda">
+
+<div class="titulo-busqueda">${titulo}</div>
+
+</div>
+`
+
+})
+
+document.getElementById("links").innerHTML=html
+
+}
+
+
+/* SELECCIONAR RESULTADO */
+
+function seleccionarResultado(tipo,id){
+
+if(tipo==="movie"){
+buscarPelicula(id)
+}
+
+if(tipo==="tv"){
+buscarSerie(id)
+}
+
+}
+
+/* FUNCION PARA ABRIR TEMPORADAS */
+
+function toggleSeason(el){
+
+let grid=el.nextElementSibling
+grid.style.display=grid.style.display=="none"?"grid":"none"
+
+}
+
+function abrirEditor(t,e,n,elemento){
+
+if(currentEpisode && currentEpisode.t===t && currentEpisode.e===e){
+
+document.getElementById("editor").style.display="none"
+currentEpisode=null
+return
+
+}
+
+currentEpisode={t,e,n,elemento}
+
+document.getElementById("editor").style.display="block"
+
+document.getElementById("editor-title").innerText=
+"Temporada "+t+" - Episodio "+e
+
+document.getElementById("editor-name").innerText=n
+
+}
+
+
+/* AGREGAR A LISTA */
+
+function agregar(){
+
+let link=document.getElementById("editor-link").value
+
+if(!link)return
+
+base.push({
+titulo:contenido.titulo,
+temporada:currentEpisode.t,
+episodio:currentEpisode.e,
+capitulo:currentEpisode.n,
+link:link,
+poster: postersTemporadas[currentEpisode.t] || contenido.poster,
+})
+
+guardar()
+
+if(currentEpisode.elemento){
+currentEpisode.elemento.classList.add("active")
+}
+
+document.getElementById("editor-link").value=""
+
+mostrar()
+
+}
+
+function guardar(){
+
+localStorage.setItem("iptv_lista",JSON.stringify(base))
+
+}
+
+function mostrar(){
+
+let html=""
+
+base.forEach((i,index)=>{
+
+let nombre=i.temporada===1 && i.episodio===1 && i.capitulo===i.titulo
+? i.titulo
+: i.titulo+` TEMP ${String(i.temporada).padStart(2,"0")} E${String(i.episodio).padStart(2,"0")}`
+
+let existe=yaExiste(nombre)
+
+let etiqueta=existe ? `<span class="ya-existe">✔ YA EXISTE</span>` : ""
+
+html+=`
+<div class="lista-item">
+
+<span class="${existe ? 'item-existe':''}">
+${nombre} ${etiqueta}
+</span>
+
+<button onclick="eliminar(${index})" class="btn-eliminar">✖</button>
+
+</div>
+`
+
+})
+
+document.getElementById("lista").innerHTML=html
+
+document.getElementById("contador").innerText="Total agregado: "+base.length
+
+}
+
+function eliminar(index){
+
+let item=base[index]
+
+let episodios=document.querySelectorAll(".ep")
+
+episodios.forEach(ep=>{
+
+let temporada=parseInt(ep.dataset.season)
+let episodio=parseInt(ep.dataset.episode)
+
+if(temporada===item.temporada && episodio===item.episodio){
+ep.classList.remove("active")
+}
+
+})
+
+base.splice(index,1)
+
+guardar()
+
+mostrar()
+
+}
+
+function generar(){
+
+let lista=""
+
+if(document.getElementById("m3ucheck").checked){
+lista="#EXTM3U\n\n"
+}
+
+base.sort((a,b)=>{
+if(a.titulo!==b.titulo){
+return a.titulo.localeCompare(b.titulo)
+}
+if(a.temporada!==b.temporada){
+return a.temporada-b.temporada
+}
+return a.episodio-b.episodio
+})
+
+let ultimaSerie = ""
+let ultimaTemporada = ""
+
+base.forEach(i=>{
+
+let esPelicula = i.temporada===1 && i.episodio===1 && i.capitulo===i.titulo
+
+// 🔥 DETECTAR CAMBIO DE SERIE O TEMPORADA
+if(!esPelicula){
+
+let tempFormateada = String(i.temporada).padStart(2,"0")
+
+if(i.titulo !== ultimaSerie || i.temporada !== ultimaTemporada){
+
+lista += `# ===== ${i.titulo} =====\n`
+lista += `# ===== TEMPORADA ${tempFormateada} =====\n\n`
+
+ultimaSerie = i.titulo
+ultimaTemporada = i.temporada
+
+}
+
+}
+
+let nombre
+let grupo
+
+if(esPelicula){
+
+nombre = i.titulo
+grupo = "PELICULAS"
+
+}else{
+
+let tempFormateada = String(i.temporada).padStart(2,"0")
+
+nombre = `TEMPORADA ${tempFormateada} "Episodio ${i.episodio}"`
+grupo = `${i.titulo}`
+
+}
+
+let nombreLimpio = nombre.replace(/,/g,"")
+
+lista+=`#EXTINF:-1 tvg-logo="https://image.tmdb.org/t/p/w500${i.poster}" group-title="${grupo}",${nombreLimpio}\n`
+
+lista+=`${i.link}\n\n`
+
+})
+
+document.getElementById("resultado").value=lista
+
+}
+
+function copiar(){
+
+let texto=document.getElementById("resultado")
+
+texto.select()
+
+document.execCommand("copy")
+
+}
+
+function limpiar(){
+
+document.getElementById("confirmBox").style.display="flex"
+
+}
+
+function confirmarLimpiar(){
+
+base=[]
+
+localStorage.removeItem("iptv_lista")
+
+document.getElementById("lista").innerHTML=""
+
+document.getElementById("resultado").value=""
+
+document.getElementById("contador").innerText="Total agregado: 0"
+
+let episodios=document.querySelectorAll(".ep")
+
+episodios.forEach(ep=>{
+ep.classList.remove("active")
+})
+
+document.getElementById("confirmBox").style.display="none"
+
+}
+
+function cancelarLimpiar(){
+
+document.getElementById("confirmBox").style.display="none"
+
+}
+
+/* BUSCAR PELICULA */
+
+async function buscarPelicula(id){
+
+let links = document.getElementById("links")
+links.style.display = "none"
+
+document.getElementById("links").style.display="block"
+
+let movie=await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=es`)
+let movieData=await movie.json()
+
+contenido={
+titulo:movieData.title,
+poster:movieData.poster_path,
+// sinopsis eliminada
+}
+
+document.getElementById("info").innerHTML=
+`<h2>${movieData.title}</h2>
+<img class="poster" src="https://image.tmdb.org/t/p/w500${movieData.poster_path}">
+<p>${movieData.overview}</p>`
+
+links.style.display = "block"
+
+document.getElementById("links").innerHTML=`
+
+<div class="editor" style="display:block">
+
+<div class="editor-flex">
+
+<div class="editor-info">
+<div>Pelicula</div>
+<div>${movieData.title}</div>
+</div>
+
+<textarea id="editor-link" placeholder="Pegar link de la película"></textarea>
+
+</div>
+
+</div>
+`
+
+currentEpisode={
+t:1,
+e:1,
+n:movieData.title
+}
+
+}
+
+
+/* BUSCAR SERIE */
+
+async function buscarSerie(id){
+
+let links = document.getElementById("links")
+links.style.display = "none"
+
+document.getElementById("links").style.display="block"
+
+let serie=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=es`)
+let serieData=await serie.json()
+
+contenido={
+titulo:serieData.name,
+poster:serieData.poster_path,
+// sinopsis eliminada
+}
+
+links.style.display = "block"
+
+document.getElementById("info").innerHTML=
+`<h2>${serieData.name}</h2>
+<img class="poster" src="https://image.tmdb.org/t/p/w500${serieData.poster_path}">
+<p>${serieData.overview}</p>`
+
+let html=""
+
+for(let t=1;t<=serieData.number_of_seasons;t++){
+
+let temporada=await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${t}?api_key=${apiKey}&language=es`)
+let tempData=await temporada.json()
+postersTemporadas[t] = tempData.poster_path
+
+html+=`<div class="season">`
+
+html+=`<div class="season-title" onclick="toggleSeason(this)">▶ Temporada ${t}</div>`
+
+html+=`<div class="grid" style="display:none">`
+
+tempData.episodes.forEach(ep=>{
+
+let nombre=ep.name||"Capítulo"
+
+/* VERIFICAR SI YA ESTA AGREGADO */
+
+let activo=base.some(i =>
+i.titulo===serieData.name &&
+i.temporada===t &&
+i.episodio===ep.episode_number
+)
+
+html+=`
+<div class="ep ${activo ? "active" : ""}"
+data-season="${t}"
+data-episode="${ep.episode_number}"
+onclick="abrirEditor(${t},${ep.episode_number},'${nombre}',this)">
+${String(ep.episode_number).padStart(2,"0")}
+</div>
+`
+
+})
+
+html+=`</div></div>`
+
+}
+
+document.getElementById("links").innerHTML=html
+
+}
+
+
+/* BUSCAR POR ID DIRECTO MEJORADO */
+
+async function buscarPorID(id){
+
+document.getElementById("links").style.display="block"
+
+let movie=await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=es`)
+let movieData=await movie.json()
+
+let serie=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=es`)
+let serieData=await serie.json()
+
+let opciones=""
+
+/* SI EXISTE PELICULA */
+
+if(movieData && movieData.title){
+
+opciones+=`
+<div class="lista-item" onclick="buscarPelicula(${id})">
+
+<div style="display:flex;align-items:center;gap:10px">
+
+<img src="https://image.tmdb.org/t/p/w200${movieData.poster_path}" style="height:80px;border-radius:6px">
+
+<span>🎬 ${movieData.title} (Película)</span>
+
+</div>
+
+</div>
+`
+
+}
+
+/* SI EXISTE SERIE */
+
+if(serieData && serieData.name){
+
+opciones+=`
+<div class="lista-item" onclick="buscarSerie(${id})">
+
+<div style="display:flex;align-items:center;gap:10px">
+
+<img src="https://image.tmdb.org/t/p/w200${serieData.poster_path}" style="height:80px;border-radius:6px">
+
+<span>📺 ${serieData.name} (Serie)</span>
+
+</div>
+
+</div>
+`
+
+}
+
+/* SI NO HAY RESULTADO */
+
+if(opciones===""){
+alert("No se encontró contenido con ese ID")
+return
+}
+
+document.getElementById("links").innerHTML=opciones
+
+}
+
+async function verListaPastebin(){
+
+let url="https://raw.githubusercontent.com/dania123456789123456-del/Lista-M3U/refs/heads/main/Lista%20M3U"
+
+let res = await fetch(url)
+
+if(!res.ok){
+alert("Error al cargar lista desde GitHub")
+return
+}
+
+let texto=await res.text()
+
+// 🔥 ARREGLO UNIVERSAL (compatibilidad entre PCs)
+texto = texto.replace(/\r/g,"")
+
+let lineas = texto.split("\n")
+
+let peliculas=[]
+let series={}
+
+let serieActual=""
+
+for(let i=0;i<lineas.length;i++){
+
+let linea=lineas[i].trim()
+
+if(linea.includes("group-title=\"PELICULAS\"")){
+
+let nombre=linea.split(",").pop().replace(/"/g,"")
+peliculas.push(nombre)
+
+}else if(linea.includes("group-title=\"")){
+
+let grupo=linea.match(/group-title="([^"]+)"/)[1]
+
+if(grupo!=="PELICULAS"){
+
+serieActual=grupo
+
+if(!series[serieActual]) series[serieActual]=[]
+
+let nombre=linea.split(",").pop().replace(/"/g,"")
+series[serieActual].push(nombre)
+
+}
+
+}
+
+}
+
+// 🔽 MOSTRAR RESULTADO
+
+let salida="PELICULAS\n\n"
+
+peliculas.forEach(p=>{
+salida+=p+"\n"
+})
+
+salida+="\n\nSERIES\n\n"
+
+for(let s in series){
+
+salida+=s+"\n"
+
+series[s].forEach(ep=>{
+salida+="   "+ep+"\n"
+})
+
+salida+="\n"
+}
+
+let html = ""
+
+/* PELICULAS */
+html += `<div class="season-title" onclick="toggleSeason(this)">▶ PELICULAS</div>`
+html += `<div style="display:none; padding-left:15px;">`
+
+peliculas.forEach(p=>{
+html += `<div>${p}</div>`
+})
+
+html += `</div>`
+
+/* SERIES */
+html += `<div class="season-title" onclick="toggleSeason(this)">▶ SERIES</div>`
+html += `<div style="display:none; padding-left:15px;">`
+
+for(let s in series){
+
+html += `<div class="season-title" style="margin-top:30px;" onclick="toggleSeason(this)">▶ ${s}</div>`
+html += `<div style="display:none; padding-left:15px;">`
+
+series[s].forEach((ep,index)=>{
+if(index === 0){
+html += `<div style="margin-top:10px;"></div>`
+}
+html += `<div>${ep}</div>`
+})
+
+html += `</div>`
+
+}
+
+html += `</div>`
+
+document.getElementById("listaPastebin").innerHTML = html
+
+}
+
+function yaExiste(nombre){
+
+// detectar episodios
+let match = nombre.match(/TEMP\s*(\d+)\s*E\s*(\d+)/i)
+
+if(match){
+
+let temp = match[1].padStart(2,"0")
+let ep = match[2].padStart(2,"0")
+
+let codigo = `TEMPORADA ${temp} E${ep}`
+
+return contenidoExistente.some(x=>x.includes(codigo))
+
+}
+
+// si no es episodio, comparar como película
+return contenidoExistente.some(x=>x.toLowerCase().includes(nombre.toLowerCase()))
+
+}
+
+</script>
+
+<div id="confirmBox" class="confirm-box">
+
+<div class="confirm-content">
+
+<p>¿Seguro que quieres borrar toda la lista?</p>
+
+<div class="confirm-buttons">
+
+<button onclick="confirmarLimpiar()">SI BORRAR</button>
+
+<button onclick="cancelarLimpiar()">CANCELAR</button>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
